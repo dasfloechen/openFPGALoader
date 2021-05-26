@@ -49,6 +49,7 @@ class JedParser: public ConfigBitstreamParser {
 		std::string noteForSection(int id) {return _data_list[id].associatedPrevNote;}
 		uint32_t feabits() {return _feabits;}
 		uint64_t featuresRow() {return _featuresRow;}
+		uint8_t securitySettings() {return _security_settings;}
 
 	private:
 		std::string readline();

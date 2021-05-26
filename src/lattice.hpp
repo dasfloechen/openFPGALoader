@@ -70,6 +70,7 @@ class Lattice: public Device, SPIInterface {
 		bool DisableISC();
 		bool EnableCfgIf();
 		bool DisableCfg();
+		bool EnableSecurity();
 		bool pollBusyFlag(bool verbose = false);
 		bool flashEraseAll();
 		bool flashErase(uint8_t mask);

@@ -58,6 +58,9 @@ using namespace std;
 #define PROG_DONE				0x5E
 #define REFRESH					0x79
 
+#define SET_SECURITY_CMD        0xCE
+#define SET_SECURITY_PLUS_CMD   0xCF
+
 #define READ_FEATURE_ROW 0xE7
 #define READ_FEABITS     0xFB
 #define READ_STATUS_REGISTER 0x3C
@@ -386,6 +389,8 @@ bool Lattice::program_intFlash()
 		}
 	}
 
+
+
 	/* ISC program done 0x5E */
 	printInfo("Write program Done: ", false);
 	if (writeProgramDone() == false) {
@@ -394,6 +399,17 @@ bool Lattice::program_intFlash()
 	} else {
 		printSuccess("DONE");
 	}
+
+    if(_jed.securitySettings() > 0)
+    {
+        printInfo("Set Security: ", false);
+        if(EnableSecurity() == false){
+            printError("FAIL");
+            return false;
+        } else {
+            printSuccess("DONE");
+        }
+    }
 
 	/* bypass */
 	wr_rd(0xff, NULL, 0, NULL, 0);
@@ -590,6 +606,25 @@ int Lattice::userCode()
 					usercode[2] << 16 |
 					usercode[1] << 8  |
 					usercode[0];
+}
+
+bool Lattice::EnableSecurity()
+{
+    uint8_t dummy[3] = { 0x00, 0x00, 0x00 };
+    wr_rd(SET_SECURITY_CMD, dummy, 3, NULL, 0);
+
+    printf(" ==> Set Security ");
+
+    _jtag->set_state(Jtag::RUN_TEST_IDLE);
+    _jtag->toggleClk(1000);
+
+    usleep(200);
+    printf(" SLEEP ");
+    if (!pollBusyFlag()) {
+        printf("ERR Set Security Failed!  ");
+        return false;
+    }
+    return true;
 }
 
 bool Lattice::checkID()
@@ -979,6 +1014,9 @@ bool Lattice::writeProgramDone()
 	wr_rd(PROG_DONE, NULL, 0, NULL, 0);
 	_jtag->set_state(Jtag::RUN_TEST_IDLE);
 	_jtag->toggleClk(1000);
+
+    usleep(200000);
+
 	if (!pollBusyFlag())
 		return false;
 	if (!checkStatus(REG_STATUS_DONE, REG_STATUS_DONE))

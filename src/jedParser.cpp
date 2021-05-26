@@ -153,6 +153,8 @@ void JedParser::displayHeader()
 		printf("area[%zd] %d %d ", i, _data_list[i].offset, _data_list[i].len);
 		printf("%s\n", _data_list[i].associatedPrevNote.c_str());
 	}
+
+	printf("Security Settings: %02X\n", securitySettings());
 }
 
 /* E field, for latice contains two sub-field
